@@ -1,6 +1,21 @@
 const AWS = require('aws-sdk');
 const dynamoclient= new AWS.DynamoDB.DocumentClient();
 
+async function list() {
+  
+  const params = {
+    TableName : 'Character'
+  };
+  
+  try {
+    const data = await dynamoclient.scan(params).promise();
+    return data;
+  } catch (err) {
+    return err;
+  }
+  
+}
+
 async function register(region, name, race, profession) {
 
   const params = {
@@ -11,7 +26,7 @@ async function register(region, name, race, profession) {
       Race: race,
       Profession: profession
     }
-  }
+  };
   
   try {
     await dynamoclient.put(params).promise();
@@ -29,10 +44,10 @@ async function retrieve(region, name) {
       Region: region,
       Name: name
     }
-  }
+  };
   
   try {
-    const character = await dynamoclient.get(params).promise()
+    const character = await dynamoclient.get(params).promise();
     console.log('Retrieved: ' + JSON.stringify(character));
     return character;
   } catch (err) {
@@ -47,9 +62,13 @@ exports.handler = async (event) => {
     if (event.type == 'register') {
       await register(event.region, event.name, event.race, event.profession);
     } else if (event.type == 'retrieve') {
-      const char = await retrieve(event.region, event.name);
+      const character = await retrieve(event.region, event.name);
+      console.log(JSON.stringify(character));
+    } else if (event.type == 'list') {
+      const characters = await list();
+      console.log(JSON.stringify(characters));
     } else {
-        console.log('Unknown Command');
+        console.log('Unknown Command: ' + event.type);
     }
     const response = {
         statusCode: 200,
