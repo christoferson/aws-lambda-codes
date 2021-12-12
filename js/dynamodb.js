@@ -22,9 +22,9 @@ async function query(region) {
   var params = {
     TableName: 'Character',
     //IndexName: 'Region',
-    KeyConditionExpression: '#name = :value',
-    ExpressionAttributeNames: { '#name': 'Region' },
-    ExpressionAttributeValues: { ':value': region }
+    KeyConditionExpression: '#region = :region and CharacterName = :name',
+    ExpressionAttributeNames: { '#region' : 'Region' },
+    ExpressionAttributeValues: { ':region' : region, ':name' : 'Name1' }
   }
 
   try {
@@ -42,7 +42,7 @@ async function register(region, name, race, profession) {
     TableName : 'Character',
     Item: {
       Region: region,
-      Name: name,
+      CharacterName: name,
       Race: race,
       Profession: profession
     }
@@ -63,7 +63,7 @@ async function retrieve(region, name) {
     TableName : 'Character',
     Key: {
       Region: region,
-      Name: name
+      CharacterName: name
     }
   };
   
