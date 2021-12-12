@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const dynamoclient= new AWS.DynamoDB.DocumentClient();
 
+
 async function list() {
   
   const params = {
@@ -12,6 +13,25 @@ async function list() {
     return data;
   } catch (err) {
     return err;
+  }
+  
+}
+
+async function query() {
+
+  var params = {
+    TableName: 'Character',
+    //IndexName: 'Region',
+    KeyConditionExpression: '#name = :value',
+    ExpressionAttributeNames: { '#name': 'Region' },
+    ExpressionAttributeValues: { ':value': 'US' }
+  }
+
+  try {
+    const data = await dynamoclient.query(params).promise()
+    return data
+  } catch (err) {
+    return err
   }
 
 }
@@ -61,14 +81,17 @@ async function retrieve(region, name) {
 
 exports.handler = async (event) => {
     console.log(event);
-    if (event.type == 'list') {
-      const characters = await list();
-      console.log(JSON.stringify(characters));
-    } else if (event.type == 'register') {
+    if (event.type == 'register') {
       await register(event.region, event.name, event.race, event.profession);
     } else if (event.type == 'retrieve') {
       const character = await retrieve(event.region, event.name);
       console.log(JSON.stringify(character));
+    } else if (event.type == 'list') {
+      const characters = await list();
+      console.log(JSON.stringify(characters));
+    } else if (event.type == 'query') {
+      const characters = await query();
+      console.log(JSON.stringify(characters));
     } else {
         console.log('Unknown Command: ' + event.type);
     }
