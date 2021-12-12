@@ -17,14 +17,14 @@ async function list() {
   
 }
 
-async function query() {
+async function query(region) {
 
   var params = {
     TableName: 'Character',
     //IndexName: 'Region',
     KeyConditionExpression: '#name = :value',
     ExpressionAttributeNames: { '#name': 'Region' },
-    ExpressionAttributeValues: { ':value': 'US' }
+    ExpressionAttributeValues: { ':value': region }
   }
 
   try {
@@ -90,7 +90,7 @@ exports.handler = async (event) => {
       const characters = await list();
       console.log(JSON.stringify(characters));
     } else if (event.type == 'query') {
-      const characters = await query();
+      const characters = await query(event.region);
       console.log(JSON.stringify(characters));
     } else {
         console.log('Unknown Command: ' + event.type);
