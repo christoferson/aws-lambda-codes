@@ -13,7 +13,7 @@ async function list() {
   } catch (err) {
     return err;
   }
-  
+
 }
 
 async function register(region, name, race, profession) {
@@ -34,6 +34,7 @@ async function register(region, name, race, profession) {
   } catch (err) {
     return err;
   }
+
 }
 
 async function retrieve(region, name) {
@@ -54,19 +55,20 @@ async function retrieve(region, name) {
     console.log('Retrieved Failed: ' + err);
     return err;
   }
+
 }
 
 
 exports.handler = async (event) => {
     console.log(event);
-    if (event.type == 'register') {
+    if (event.type == 'list') {
+      const characters = await list();
+      console.log(JSON.stringify(characters));
+    } else if (event.type == 'register') {
       await register(event.region, event.name, event.race, event.profession);
     } else if (event.type == 'retrieve') {
       const character = await retrieve(event.region, event.name);
       console.log(JSON.stringify(character));
-    } else if (event.type == 'list') {
-      const characters = await list();
-      console.log(JSON.stringify(characters));
     } else {
         console.log('Unknown Command: ' + event.type);
     }
