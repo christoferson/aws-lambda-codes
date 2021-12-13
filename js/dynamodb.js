@@ -45,13 +45,15 @@ async function register(region, name, race, profession) {
       CharacterName: name,
       Race: race,
       Profession: profession
-    }
+    },
+    ConditionExpression : 'attribute_not_exists(CharacterName)'
   };
   
   try {
     await dynamoclient.put(params).promise();
-    console.log('Inserted ' + JSON.stringify(params.Item));
+    console.log('Registered ' + JSON.stringify(params.Item));
   } catch (err) {
+    console.log('Register Failed: ' + err);
     return err;
   }
 
