@@ -79,6 +79,35 @@ async function retrieve(region, name) {
 }
 
 
+async function editSet(region, name, race, profession) {
+  
+  const params = {
+    TableName: 'Character',
+    Key: {
+      Region: region,
+      CharacterName: name
+    },
+    ExpressionAttributeNames: {
+        '#Race': 'Race',
+        '#Profession': 'Profession'
+    },
+    ExpressionAttributeValues: {
+        ':race': race,
+        ':profession': profession
+    },
+    UpdateExpression: 'SET #Race = :race, #Profession = :profession'
+  };
+
+  try {
+    await dynamoclient.update(params).promise();
+    console.log('Updated ' + JSON.stringify(params.Key));
+  } catch (err) {
+    console.log('EditSet Failed: ' + err);
+    return err;
+  }
+}
+
+
 exports.handler = async (event) => {
     console.log(event);
     if (event.type == 'register') {
@@ -92,6 +121,8 @@ exports.handler = async (event) => {
     } else if (event.type == 'query') {
       const characters = await query(event.region);
       console.log(JSON.stringify(characters));
+    } else if (event.type == 'edit-set') {
+      await editSet(event.region, event.name, event.race, event.profession);
     } else {
         console.log('Unknown Command: ' + event.type);
     }
