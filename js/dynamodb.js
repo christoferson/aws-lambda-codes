@@ -97,7 +97,8 @@ async function editSet(region, name, race, profession) {
         ':race': race,
         ':profession': profession
     },
-    UpdateExpression: 'SET #Race = :race, #Profession = :profession'
+    UpdateExpression: 'SET #Race = :race, #Profession = :profession',
+    ConditionExpression : 'attribute_exists(CharacterName)'
   };
 
   try {
