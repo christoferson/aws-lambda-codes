@@ -19,15 +19,7 @@ async function list() {
 }
 
 async function query(region) {
-  /*
-  var params = {
-    TableName: 'Character',
-    //IndexName: 'Region',
-    KeyConditionExpression: '#region = :region and CharacterName = :name',
-    ExpressionAttributeNames: { '#region' : 'Region' },
-    ExpressionAttributeValues: { ':region' : region, ':name' : 'Name1' }
-  }
-  */
+  
   var params = {
     TableName: dynamo_table,
     KeyConditionExpression: '#region = :region',
@@ -36,6 +28,14 @@ async function query(region) {
   };
   
   params = {
+    TableName: 'Character',
+    KeyConditionExpression: '#region = :region and CharacterName = :name',
+    ExpressionAttributeNames: { '#region' : 'Region' },
+    ExpressionAttributeValues: { ':region' : region, ':name' : 'Name1' }
+  }
+  
+  // Local Secondary Index
+  params = {
     TableName: dynamo_table,
     IndexName: 'region-profession',
     KeyConditionExpression: '#region = :region AND Profession = :profession',
@@ -43,6 +43,7 @@ async function query(region) {
     ExpressionAttributeValues: { ':region' : region, ':profession' : 'Hunter' }
   };
 
+  // Local Secondary Index
   params = {
     TableName: dynamo_table,
     IndexName: 'region-race',
