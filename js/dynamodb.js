@@ -18,7 +18,7 @@ async function list() {
 }
 
 async function query(region) {
-
+  /*
   var params = {
     TableName: 'Character',
     //IndexName: 'Region',
@@ -26,12 +26,31 @@ async function query(region) {
     ExpressionAttributeNames: { '#region' : 'Region' },
     ExpressionAttributeValues: { ':region' : region, ':name' : 'Name1' }
   }
+  */
+  var params = {
+    TableName: 'Character',
+    KeyConditionExpression: '#region = :region',
+    ExpressionAttributeNames: { '#region' : 'Region' },
+    ExpressionAttributeValues: { ':region' : region }
+  };
 
   try {
-    const data = await dynamoclient.query(params).promise()
-    return data
+    
+    const callback = function(err, data) {
+      if (err) {
+        console.log(err);
+      } else {
+       data.Items.forEach(function(character, index) {
+           console.log("   * " + character.CharacterName);
+        });
+      }
+    };
+    
+    const characters = await dynamoclient.query(params, callback).promise();
+    return characters;
+
   } catch (err) {
-    return err
+    return err;
   }
 
 }
@@ -123,12 +142,13 @@ exports.handler = async (event) => {
       console.log(JSON.stringify(characters));
     } else if (event.type == 'query') {
       const characters = await query(event.region);
-      console.log(JSON.stringify(characters));
+      console.log("Query-Result: " + JSON.stringify(characters));
     } else if (event.type == 'edit-set') {
       await editSet(event.region, event.name, event.race, event.profession);
     } else {
         console.log('Unknown Command: ' + event.type);
     }
+    console.log("Return Response.");
     const response = {
         statusCode: 200,
         body: JSON.stringify('Hi from the ' + event.routeKey + ' route!'),
