@@ -1,11 +1,12 @@
 const AWS = require('aws-sdk');
-const dynamoclient= new AWS.DynamoDB.DocumentClient();
+const dynamoclient = new AWS.DynamoDB.DocumentClient();
 
+const dynamo_table = "Character2";
 
 async function list() {
   
   const params = {
-    TableName : 'Character'
+    TableName : dynamo_table
   };
   
   try {
@@ -28,11 +29,27 @@ async function query(region) {
   }
   */
   var params = {
-    TableName: 'Character',
+    TableName: dynamo_table,
     KeyConditionExpression: '#region = :region',
     ExpressionAttributeNames: { '#region' : 'Region' },
     ExpressionAttributeValues: { ':region' : region }
   };
+  
+  params = {
+    TableName: dynamo_table,
+    IndexName: 'region-profession',
+    KeyConditionExpression: '#region = :region AND Profession = :profession',
+    ExpressionAttributeNames: { '#region' : 'Region' },
+    ExpressionAttributeValues: { ':region' : region, ':profession' : 'Hunter' }
+  };
+
+  params = {
+    TableName: dynamo_table,
+    IndexName: 'region-race',
+    KeyConditionExpression: '#region = :region AND Race = :race',
+    ExpressionAttributeNames: { '#region' : 'Region' },
+    ExpressionAttributeValues: { ':region' : region, ':race' : 'Human' }
+  };  
 
   try {
     
@@ -58,7 +75,7 @@ async function query(region) {
 async function register(region, name, race, profession) {
 
   const params = {
-    TableName : 'Character',
+    TableName : dynamo_table,
     Item: {
       Region: region,
       CharacterName: name,
@@ -81,7 +98,7 @@ async function register(region, name, race, profession) {
 async function retrieve(region, name) {
 
   const params = {
-    TableName : 'Character',
+    TableName : dynamo_table,
     Key: {
       Region: region,
       CharacterName: name
@@ -103,7 +120,7 @@ async function retrieve(region, name) {
 async function editSet(region, name, race, profession) {
   
   const params = {
-    TableName: 'Character',
+    TableName: dynamo_table,
     Key: {
       Region: region,
       CharacterName: name
@@ -148,10 +165,10 @@ exports.handler = async (event) => {
     } else {
         console.log('Unknown Command: ' + event.type);
     }
-    console.log("Return Response.");
+
     const response = {
         statusCode: 200,
-        body: JSON.stringify('Hi from the ' + event.routeKey + ' route!'),
+        body: JSON.stringify('Processed ' + event.type + '!'),
     };
     return response;
 };
